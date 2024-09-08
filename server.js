@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const session = require('express-session');
 const passport = require('passport');
 const morgan = require('morgan');
+const cors = require('cors');
 require('dotenv').config();
 require('./config/passport');
 
@@ -19,8 +20,18 @@ require('./config/database.js');
 // Connect to Passport
 require('./config/passport');
 
+
+
 // new code below
 const User = require('./models/user');
+
+// routes
+const authRoutes = require('./routes/auth');
+
+
+app.use(cors());
+app.use(express.json());
+app.use('/api/auth', authRoutes);
 
 // Middleware
 app.use(session({
