@@ -1,12 +1,13 @@
 // server.js
 const express = require('express');
 const mongoose = require('mongoose');
+const MongoStore = require('connect-mongo');
 const session = require('express-session');
-const passport = require('passport');
+ const passport = require('passport');
 const morgan = require('morgan');
 const cors = require('cors');
 require('dotenv').config();
-require('./config/passport');
+// require('./config/passport');
 
 
 
@@ -14,7 +15,8 @@ require('./config/passport');
 const app = express();
 
 // Connect to MongoDB
-require('./config/database.js');
+require('./config/database');
+
 
 
 // Connect to Passport
@@ -37,7 +39,9 @@ app.use('/api/auth', authRoutes);
 app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
-    saveUninitialized: true
+    saveUninitialized: true, 
+    store: MongoStore.create({ mongoUrl: process.env.MONGODB_URI }) // Store sessions in MongoDB
+
 }));
 app.use(passport.initialize());
 app.use(passport.session());
@@ -55,6 +59,8 @@ app.get('/api/profile', (req, res) => {
     res.send(req.user); // Send user profile
 });
 
-app.listen(3000, () => {
-    console.log('Server is running on port 3000');
+// Start the server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server started on http://localhost:${PORT}`);
 });
