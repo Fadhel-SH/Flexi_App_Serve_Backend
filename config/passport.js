@@ -4,7 +4,13 @@ const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 // const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const mongoose = require('mongoose');
 const User = require('../models/user'); 
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
+// Utility function to generate JWT token
+const generateToken = (user) => {
+    return jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '30d' });
+};
 passport.serializeUser((user, done) => {
     done(null, user.id);
 });
@@ -25,7 +31,7 @@ passport.use(new GoogleStrategy({
         if (existingUser) {
             done(null, existingUser);
         } else {
-            new User({
+            user = new User({
                 displayName: profile.displayName,
                 email: profile.emails[0].value,
                 provider: "google",
@@ -33,6 +39,9 @@ passport.use(new GoogleStrategy({
             }).save().then((newUser) => {
                 done(null, newUser);
             });
+
+                    // Generate token
+        const token = generateToken(user);
         }
     });
 }));

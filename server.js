@@ -52,7 +52,6 @@ app.get('/api/auth/google-login', passport.authenticate('google', {
 }));
 
 app.get('/api/auth/google-callback', passport.authenticate('google'), (req, res) => {
-   console.log(res);
     res.redirect('/'); // Redirect to your frontend or desired route
 });
 
